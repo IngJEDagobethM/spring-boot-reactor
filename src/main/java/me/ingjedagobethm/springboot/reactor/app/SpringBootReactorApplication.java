@@ -21,14 +21,16 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		// Flux es un Publisher u Observable
 		Flux<String> nombres = Flux.just("Cindy", "Javier", "Adrian", "Fabian", "Duvalier", "Ivonne")
 				//.doOnNext(System.out::println); // de lambda a callable
+				.map(nombre -> nombre.toLowerCase())
 				.doOnNext(elemento -> { // Para múltiples instrucciones se coloca entre llaves
 					if(elemento.isEmpty()){
 						throw new RuntimeException("Nombre no puede ser vacio.");
 					}
 					System.out.println(elemento);
-				});
+				})
+				.map(nombre -> nombre.toUpperCase());
 
-		// Por si solo no es posible "invocar" la ejecución del flujo,
+		// Por si solo no es posible "observar" la ejecución del flujo,
 		// nos debemos subscribir al evento.
 		nombres.subscribe(
 				log::info,
@@ -38,6 +40,6 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 					public void run() {
 						log.info("Ha finalizado la ejecución del observable con éxito.");
 					}
-				}); // Consumer  u Observador
+				}); // Consumer u Observador
 	}
 }
