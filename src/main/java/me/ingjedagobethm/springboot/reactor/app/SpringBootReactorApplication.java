@@ -22,6 +22,7 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		Flux<String> nombres = Flux.just("Cindy", "Javier", "Adrian", "Fabian", "Duvalier", "Ivonne")
 				//.doOnNext(System.out::println); // de lambda a callable
 				.map(nombre -> nombre.toLowerCase())
+				.filter(elemento -> elemento.contains("y")) // filtra por los elementos que contengas "y"
 				.doOnNext(elemento -> { // Para múltiples instrucciones se coloca entre llaves
 					if(elemento.isEmpty()){
 						throw new RuntimeException("Nombre no puede ser vacio.");
