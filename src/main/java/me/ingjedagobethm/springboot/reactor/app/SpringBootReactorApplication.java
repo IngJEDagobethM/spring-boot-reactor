@@ -7,6 +7,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SpringBootApplication
 public class SpringBootReactorApplication implements CommandLineRunner {
 
@@ -18,8 +21,29 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		transformaFlujo();
+	}
+
+	public List<String> usandoArray(){
+		List<String> nombres = new ArrayList<>();
+		nombres.add("Cindy");
+		nombres.add("Javier");
+		nombres.add("Adrian");
+		nombres.add("Fabian");
+		nombres.add("Duvalier");
+		nombres.add("Ivonne");
+		return nombres;
+	}
+
+	public Flux<String> usandoJust() {
 		// Flux es un Publisher u Observable
 		Flux<String> nombres = Flux.just("Cindy", "Javier", "Adrian", "Fabian", "Duvalier", "Ivonne");
+		return nombres;
+	}
+
+	public void transformaFlujo(){
+		//Flux<String> nombres = usandoJust();
+		Flux<String> nombres = Flux.fromIterable(usandoArray());
 				//.doOnNext(System.out::println); // de lambda a callable
 		Flux<String> newNombres = nombres.map(String::toLowerCase)
 				.filter(elemento -> elemento.contains("y")) // filtra por los elementos que contengas "y"
