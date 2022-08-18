@@ -19,9 +19,9 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// Flux es un Publisher u Observable
-		Flux<String> nombres = Flux.just("Cindy", "Javier", "Adrian", "Fabian", "Duvalier", "Ivonne")
+		Flux<String> nombres = Flux.just("Cindy", "Javier", "Adrian", "Fabian", "Duvalier", "Ivonne");
 				//.doOnNext(System.out::println); // de lambda a callable
-				.map(nombre -> nombre.toLowerCase())
+		Flux<String> newNombres = nombres.map(String::toLowerCase)
 				.filter(elemento -> elemento.contains("y")) // filtra por los elementos que contengas "y"
 				.doOnNext(elemento -> { // Para múltiples instrucciones se coloca entre llaves
 					if(elemento.isEmpty()){
@@ -29,11 +29,13 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 					}
 					System.out.println(elemento);
 				})
-				.map(nombre -> nombre.toUpperCase());
+				.map(String::toUpperCase);
 
 		// Por si solo no es posible "observar" la ejecución del flujo,
 		// nos debemos subscribir al evento.
-		nombres.subscribe(
+		// recordar que los flujos son inmutables.
+		//nombres.subscribe( // Imprime el flujo original
+		newNombres.subscribe( // Imprime el flujo transformado
 				log::info,
 				error -> log.error(error.getMessage()),
 				new Runnable() {
