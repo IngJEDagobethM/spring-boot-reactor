@@ -3,6 +3,8 @@ package me.ingjedagobethm.springboot.reactor.app;
 import me.ingjedagobethm.springboot.reactor.app.models.Comentario;
 import me.ingjedagobethm.springboot.reactor.app.models.Usuario;
 import me.ingjedagobethm.springboot.reactor.app.models.UsuarioComentario;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -40,7 +42,9 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//flujoInterval();
 		//flujoDelayElements();
 		//flujoIntervalInfinito();
-		crearObservableDesdeCero();
+		//crearObservableDesdeCero();
+		//contrapresionManual();
+		contrapresionOperador();
 	}
 
 	public List<Usuario> usandoArrayUsuario(){
@@ -245,5 +249,48 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 				next -> log.info(next.toString()),
 				error -> log.error(error.getMessage()),
 				() -> log.info("Finalizado.")); // OnCompleted se lanza solo si finaliza con éxito.
+	}
+
+	public void contrapresionManual(){
+		Flux.range(1, 20)
+				.log()
+				.subscribe(new Subscriber<Integer>() { // <tipo_dato> elemenos del flujo
+					private Subscription s;
+					private Integer limite = 5;
+					private Integer consumido = 0;
+					@Override
+					public void onSubscribe(Subscription subscription) {
+						this.s = subscription;
+						// s.request(Long.MAX_VALUE); // Pide el número máximo de elementos del flujo
+						s.request(limite); // Pide 2 elementos del flujo
+					}
+
+					@Override
+					public void onNext(Integer integer) {
+						log.info(integer.toString());
+						consumido++;
+						if(consumido == limite){
+							consumido = 0;
+							s.request(limite);
+						}
+					}
+
+					@Override
+					public void onError(Throwable throwable) {
+
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+	}
+
+	public void contrapresionOperador(){
+		Flux.range(1, 20)
+				.log()
+				.limitRate(5)
+				.subscribe(i -> log.info(i.toString()));
 	}
 }
