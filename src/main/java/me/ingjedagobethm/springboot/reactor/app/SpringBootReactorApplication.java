@@ -1,11 +1,13 @@
 package me.ingjedagobethm.springboot.reactor.app;
 
+import me.ingjedagobethm.springboot.reactor.app.models.Usuario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,21 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		transformaFlujo();
+		//transformaFlujo();
+		//transformaFlujoFlatMap();
+		//transformaFlujoToString();
+		transformaFlujoToCollectList();
+	}
+
+	public List<Usuario> usandoArrayUsuario(){
+		List<Usuario> usuarios = new ArrayList<>();
+		usuarios.add(new Usuario ("Cindy"));
+		usuarios.add(new Usuario ("Javier"));
+		usuarios.add(new Usuario ("Adrian"));
+		usuarios.add(new Usuario ("Fabian"));
+		usuarios.add(new Usuario ("Duvalier"));
+		usuarios.add(new Usuario ("Ivonne"));
+		return usuarios;
 	}
 
 	public List<String> usandoArray(){
@@ -42,8 +58,7 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	}
 
 	public void transformaFlujo(){
-		//Flux<String> nombres = usandoJust();
-		Flux<String> nombres = Flux.fromIterable(usandoArray());
+		Flux<String> nombres = usandoJust();
 				//.doOnNext(System.out::println); // de lambda a callable
 		Flux<String> newNombres = nombres.map(String::toLowerCase)
 				.filter(elemento -> elemento.contains("y")) // filtra por los elementos que contengas "y"
@@ -68,5 +83,41 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 						log.info("Ha finalizado la ejecución del observable con éxito.");
 					}
 				}); // Consumer u Observador
+	}
+
+	public void transformaFlujoFlatMap(){
+		Flux<String> nombres = Flux.fromIterable(usandoArray())
+				.map(String::toLowerCase)
+				.flatMap(elemento -> {
+					if(elemento.contains("n")){
+						return Mono.just(elemento); // retorna un observable
+					}else{
+						return Mono.empty();
+					}
+				})
+				.map(String::toUpperCase);
+
+		nombres.subscribe(log::info);
+	}
+
+	public void transformaFlujoToString(){
+		Flux.fromIterable(usandoArrayUsuario())
+				.map(Usuario::toString)
+				.flatMap(elemento -> {
+					if(elemento.contains("an")){
+						return Mono.just(elemento);
+					}else{
+						return Mono.empty();
+					}
+				})
+				.map(String::toUpperCase)
+				.subscribe(log::info);
+	}
+
+	public void transformaFlujoToCollectList(){
+		Flux.fromIterable(usandoArrayUsuario())
+				.collectList()
+				//.subscribe(usuario -> log.info(usuario.toString()));
+				.subscribe(lista -> log.info(lista.toString()));
 	}
 }
