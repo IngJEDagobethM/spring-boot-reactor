@@ -11,8 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 @SpringBootApplication
 public class SpringBootReactorApplication implements CommandLineRunner {
@@ -32,7 +34,10 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//mergeFlujosFlatMap();
 		//mergeFlujosZipWith();
 		//mergeFlujosZipWithTuple();
-		mergeFlujosZipWithRange();
+		//mergeFlujosZipWithRange();
+		//flujoInterval();
+		//flujoDelayElements();
+		flujoIntervalInfinito();
 	}
 
 	public List<Usuario> usandoArrayUsuario(){
@@ -175,5 +180,43 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 				.map(i -> (i*2))
 				.zipWith(Flux.range(1,6), (uno, dos) -> String.format("Primer Flux: %d, Segundo Flux: %d", uno, dos))
 				.subscribe(texto -> log.info(texto));
+	}
+
+	public void flujoInterval(){
+		Flux<Integer> rango = Flux.range(1, 12);
+		Flux<Long> retraso = Flux.interval(Duration.ofSeconds(1));
+
+		rango.zipWith(retraso, (r, rr) -> r)
+				.doOnNext(i -> log.info(i.toString()))
+				//.subscribe(); // No es posible observar debido al no bloqueo de procesos
+				.blockLast(); // Se subscribe al flujo pero bloquea el proceso (para poder ver la salida) **No Recomendable**
+	}
+
+	public void flujoDelayElements(){
+		Flux<Integer> rango = Flux.range(1, 12)
+				.delayElements(Duration.ofSeconds(1))
+				.doOnNext(i -> log.info(i.toString()));
+
+		rango.subscribe();
+		//.blockLast(); // Se subscribe al flujo pero bloquea el proceso (para poder ver la salida) **No Recomendable**
+	}
+
+	public void flujoIntervalInfinito() throws InterruptedException {
+
+		CountDownLatch latch = new CountDownLatch(1);
+
+		Flux.interval(Duration.ofSeconds(1))
+				.doOnTerminate(latch::countDown)
+				.flatMap(i -> {
+					if(i > 4){
+						return Flux.error(new InterruptedException("Solo hasta 5!"));
+					}
+					return Flux.just(i);
+				})
+				.map(i -> "#".concat(i.toString()))
+				.retry(2) // Reintenta las veces definidas si detecta error.
+				.subscribe(s -> log.info(s), e -> log.error(e.getMessage()));
+
+		latch.await();
 	}
 }
