@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 @SpringBootApplication
@@ -37,7 +39,8 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//mergeFlujosZipWithRange();
 		//flujoInterval();
 		//flujoDelayElements();
-		flujoIntervalInfinito();
+		//flujoIntervalInfinito();
+		crearObservableDesdeCero();
 	}
 
 	public List<Usuario> usandoArrayUsuario(){
@@ -218,5 +221,29 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 				.subscribe(s -> log.info(s), e -> log.error(e.getMessage()));
 
 		latch.await();
+	}
+
+	public void crearObservableDesdeCero(){
+		Flux.create(emiter -> {
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				private Integer contador = 0;
+				@Override
+				public void run() {
+					emiter.next(++contador);
+					if(contador == 10){
+						timer.cancel(); // Detiene el proceso Timer
+						emiter.complete(); // Termina el flujo
+					}
+					if (contador == 5){
+						timer.cancel();
+						emiter.error(new InterruptedException("El contador lanzó 5. :("));
+					}
+				}
+			}, 1000, 1000);
+		}).subscribe(
+				next -> log.info(next.toString()),
+				error -> log.error(error.getMessage()),
+				() -> log.info("Finalizado.")); // OnCompleted se lanza solo si finaliza con éxito.
 	}
 }
