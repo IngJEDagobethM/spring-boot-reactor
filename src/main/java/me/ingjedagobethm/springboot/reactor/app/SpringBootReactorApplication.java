@@ -31,7 +31,8 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//transformaFlujoToCollectList();
 		//mergeFlujosFlatMap();
 		//mergeFlujosZipWith();
-		mergeFlujosZipWithTuple();
+		//mergeFlujosZipWithTuple();
+		mergeFlujosZipWithRange();
 	}
 
 	public List<Usuario> usandoArrayUsuario(){
@@ -167,5 +168,12 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		usuarioMono.zipWith(comentarioMono)
 				.map((tuple) -> new UsuarioComentario(tuple.getT1(), tuple.getT2()))
 				.subscribe(usuarioComentario -> log.info(usuarioComentario.toString()));
+	}
+
+	public void mergeFlujosZipWithRange(){
+		Flux.just(1,2,3,4,5,6)
+				.map(i -> (i*2))
+				.zipWith(Flux.range(1,6), (uno, dos) -> String.format("Primer Flux: %d, Segundo Flux: %d", uno, dos))
+				.subscribe(texto -> log.info(texto));
 	}
 }
