@@ -1,6 +1,8 @@
 package me.ingjedagobethm.springboot.reactor.app;
 
+import me.ingjedagobethm.springboot.reactor.app.models.Comentario;
 import me.ingjedagobethm.springboot.reactor.app.models.Usuario;
+import me.ingjedagobethm.springboot.reactor.app.models.UsuarioComentario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +28,10 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//transformaFlujo();
 		//transformaFlujoFlatMap();
 		//transformaFlujoToString();
-		transformaFlujoToCollectList();
+		//transformaFlujoToCollectList();
+		//mergeFlujosFlatMap();
+		//mergeFlujosZipWith();
+		mergeFlujosZipWithTuple();
 	}
 
 	public List<Usuario> usandoArrayUsuario(){
@@ -119,5 +124,48 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 				.collectList()
 				//.subscribe(usuario -> log.info(usuario.toString()));
 				.subscribe(lista -> log.info(lista.toString()));
+	}
+
+	public void mergeFlujosFlatMap(){
+		Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("Pepito"));
+		Mono<Comentario> comentarioMono = Mono.fromCallable(() -> {
+			Comentario comentario = new Comentario();
+			comentario.addComentario("¡Hola!");
+			comentario.addComentario("Este es mi super comentario.");
+			comentario.addComentario("¡Adios!");
+			return comentario;
+		});
+
+		usuarioMono.flatMap(usuario -> comentarioMono.map(comentario -> new UsuarioComentario(usuario, comentario)))
+				.subscribe(usuarioComentario -> log.info(usuarioComentario.toString()));
+	}
+
+	public void mergeFlujosZipWith(){
+		Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("Pepito"));
+		Mono<Comentario> comentarioMono = Mono.fromCallable(() -> {
+			Comentario comentario = new Comentario();
+			comentario.addComentario("¡Hola!");
+			comentario.addComentario("Este es mi super comentario.");
+			comentario.addComentario("¡Adios!");
+			return comentario;
+		});
+
+		usuarioMono.zipWith(comentarioMono, (usuario, comentario) -> new UsuarioComentario(usuario, comentario))
+				.subscribe(usuarioComentario -> log.info(usuarioComentario.toString()));
+	}
+
+	public void mergeFlujosZipWithTuple(){
+		Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("Pepito"));
+		Mono<Comentario> comentarioMono = Mono.fromCallable(() -> {
+			Comentario comentario = new Comentario();
+			comentario.addComentario("¡Hola!");
+			comentario.addComentario("Este es mi super comentario.");
+			comentario.addComentario("¡Adios!");
+			return comentario;
+		});
+
+		usuarioMono.zipWith(comentarioMono)
+				.map((tuple) -> new UsuarioComentario(tuple.getT1(), tuple.getT2()))
+				.subscribe(usuarioComentario -> log.info(usuarioComentario.toString()));
 	}
 }
