@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
@@ -256,7 +257,7 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 				.log()
 				.subscribe(new Subscriber<Integer>() { // <tipo_dato> elemenos del flujo
 					private Subscription s;
-					private Integer limite = 5;
+					private final Integer limite = 5;
 					private Integer consumido = 0;
 					@Override
 					public void onSubscribe(Subscription subscription) {
@@ -269,7 +270,7 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 					public void onNext(Integer integer) {
 						log.info(integer.toString());
 						consumido++;
-						if(consumido == limite){
+						if(Objects.equals(consumido, limite)){
 							consumido = 0;
 							s.request(limite);
 						}
@@ -277,12 +278,12 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 					@Override
 					public void onError(Throwable throwable) {
-
+						// TODO document why this method is empty
 					}
 
 					@Override
 					public void onComplete() {
-
+						// TODO document why this method is empty
 					}
 				});
 	}
