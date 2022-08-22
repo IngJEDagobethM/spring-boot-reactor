@@ -35,11 +35,11 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//transformaFlujoFlatMap();
 		//transformaFlujoToString();
 		//transformaFlujoToCollectList();
-		//mergeFlujosFlatMap();
+		mergeFlujosFlatMap();
 		//mergeFlujosZipWith();
 		//mergeFlujosZipWithTuple();
 		//mergeFlujosZipWithRange();
-		flujoInterval();
+		//flujoInterval();
 		//flujoDelayElements();
 		//flujoIntervalInfinito();
 		//crearObservableDesdeCero();
