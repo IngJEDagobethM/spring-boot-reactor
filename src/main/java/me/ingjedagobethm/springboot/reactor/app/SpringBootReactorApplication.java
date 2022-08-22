@@ -39,12 +39,12 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 		//mergeFlujosZipWith();
 		//mergeFlujosZipWithTuple();
 		//mergeFlujosZipWithRange();
-		//flujoInterval();
+		flujoInterval();
 		//flujoDelayElements();
 		//flujoIntervalInfinito();
 		//crearObservableDesdeCero();
 		//contrapresionManual();
-		contrapresionOperador();
+		//contrapresionOperador();
 	}
 
 	public List<Usuario> usandoArrayUsuario(){
