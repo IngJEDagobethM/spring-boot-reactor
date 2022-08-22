@@ -31,11 +31,11 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		//transformaFlujo();
+		transformaFlujo();
 		//transformaFlujoFlatMap();
 		//transformaFlujoToString();
 		//transformaFlujoToCollectList();
-		mergeFlujosFlatMap();
+		//mergeFlujosFlatMap();
 		//mergeFlujosZipWith();
 		//mergeFlujosZipWithTuple();
 		//mergeFlujosZipWithRange();
